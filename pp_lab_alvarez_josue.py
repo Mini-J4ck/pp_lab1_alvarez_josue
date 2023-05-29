@@ -54,6 +54,8 @@ def menu_principal(lista_jugadores:list) -> None:
                 mostrar_promedio_puntos_jugadores(lista_jugadores)
             case 6:
                 revisar_jugador_salon_fama(lista_jugadores)    
+            case 7:
+                mostrar_jugador__mayor_key(lista_jugadores, "rebotes_totales")
             case _:
                 print("Dato Incorrecto")
         input("\nPulse enter para continuar\n")
@@ -277,11 +279,26 @@ def revisar_jugador_salon_fama(jugadores:list) -> None:
         return 0
     else:
         lista_encontrados = buscar_jugador_nombre(jugadores)
+        logro = "Miembro del Salon de la Fama del Baloncesto"
         for jugador in lista_encontrados:
-            if re.search("Miembro", jugador["logros"][-1]):
-                print("El jugador {0} es {1}".format(jugador["nombre"], jugador["logros"][-1]))
+            
+            if re.search(r"^"+  re.escape(logro) +"$", jugador["logros"][-1]):
+                print("El jugador {0} es {1}".format(jugador["nombre"], logro))
             else:
-                print("El jugador {0} no es {1}".format(jugador["nombre"], jugador["logros"][-1]))
+                print("El jugador {0} no es {1}".format(jugador["nombre"], logro))
+#----------------------------------------------------------------
+
+#7
+def buscar_mayor_jugador_clave(jugadores:list, key_ing:str):
+    for jugador in range(len(jugadores)-1):
+        if jugadores[jugador]["estadisticas"][key_ing] > jugadores[jugador + 1]["estadisticas"][key_ing]:
+            jugadores[jugador], jugadores[jugador + 1] =  jugadores[jugador + 1], jugadores[jugador]
+    return jugadores[-1]
+
+def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str):
+    jugador_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar)
+    print("Nombre: {0}, {1}: {2}\n".format(jugador_encontrados["nombre"],key_buscar, jugador_encontrados["estadisticas"][key_buscar]))
+
 
 lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
 menu_principal(lista_jugadores)
