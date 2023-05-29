@@ -17,6 +17,9 @@ def imprimir_menu_opciones() -> None:
     7 - Mostrat al jugador con la mayor cantidad de rebotes totales
     8 - Mostrar el jugador con el mayor porcentaje de tiros de campo
     9 - Mostrar el jugador con la mayor cantidad de asistencias totales
+    10 - Mostrar los jugadores que han promediado más puntos por partido
+    11 - Mostrar los jugadores que han promediado más rebotes por partido
+    12 - Mostrar los jugadores que han promediado más asistencias por partido
     7 - salir
     """)
 #----------------------------------------------------------------
@@ -63,6 +66,12 @@ def menu_principal(lista_jugadores:list) -> None:
                 mostrar_jugador__mayor_key(lista_jugadores, "porcentaje_tiros_de_campo")
             case 9:
                 mostrar_jugador__mayor_key(lista_jugadores, "asistencias_totales")
+            case 10:
+                jugadores_superioes_promedio_key(lista_jugadores, "promedio_puntos_por_partido")
+            case 11:
+                jugadores_superioes_promedio_key(lista_jugadores, "promedio_rebotes_por_partido")
+            case 12:
+                jugadores_superioes_promedio_key(lista_jugadores, "promedio_asistencias_por_partido") 
             case _:
                 print("Dato Incorrecto")
         input("\nPulse enter para continuar\n")
@@ -283,7 +292,7 @@ def revisar_jugador_salon_fama(jugadores:list) -> None:
     no retorna nada
     """
     if len(jugadores) == 0:
-        return 0
+        print("Lista Vacia")
     else:
         lista_encontrados = buscar_jugador_nombre(jugadores)
         logro = "Miembro del Salon de la Fama del Baloncesto"
@@ -309,19 +318,34 @@ def buscar_mayor_jugador_clave(jugadores:list, key_ing:str) -> dict:
             if jugadores[jugador]["estadisticas"][key_ing] > jugadores[jugador + 1]["estadisticas"][key_ing]:
                 jugadores[jugador], jugadores[jugador + 1] =  jugadores[jugador + 1], jugadores[jugador]
         return jugadores[-1]
-
+#----------------------------------------------------------------
 def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str) -> None:
     """
-    con el jugador encontrado muestra los datos de la clave
-    recibe una lista y un string para la clave
-    no retorna nada solo imprime un mensaje
+    Con el jugador encontrado muestra los datos de la clave
+    Recibe una lista y un string para la clave
+    No retorna nada solo imprime un mensaje
     """
     if len(jugadores) == 0:
         print("Lista Vacia")
     else:
         jugador_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar)
         print("Nombre: {0}, {1}: {2}\n".format(jugador_encontrados["nombre"],key_buscar, jugador_encontrados["estadisticas"][key_buscar]))
+#----------------------------------------------------------------
 
-
+#PUNTO 10, 11, 12 
+def jugadores_superioes_promedio_key(jugadores:list, key_buscar:str):
+    if len(jugadores) == 0: 
+        print("Lista Vacia")
+    else:
+        lista_encontrados = ordenar_segun_key(jugadores, key_buscar)
+        dato_ingresado = (validar_ingreso_numero(input("ingrese el valor a superar: ")))
+        print("los jugadores que superan {0} son:\n".format(dato_ingresado))
+        bandera = False
+        for jugador in lista_encontrados:
+            if jugador["estadisticas"][key_buscar] > dato_ingresado:
+                print("Nombre: {0}, {1}: {2}".format(jugador["nombre"], key_buscar, jugador["estadisticas"][key_buscar]))
+                bandera = True
+        if bandera == False:
+            print("Nadie supera el valor ingresado")
 lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
 menu_principal(lista_jugadores)
