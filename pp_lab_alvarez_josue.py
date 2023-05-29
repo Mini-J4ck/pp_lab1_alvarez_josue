@@ -82,6 +82,10 @@ def menu_principal(lista_jugadores:list) -> None:
                 promedio_puntos_partido_sin_menor(lista_jugadores, "promedio_puntos_por_partido")
             case 17:
                 buscar_mostrar_jugador_mayor_logros(lista_jugadores)
+            case 18:
+                jugadores_superioes_promedio_key(lista_jugadores, "porcentaje_tiros_triples")
+            case 19:
+                mostrar_jugador__mayor_key(lista_jugadores, "temporadas")
             case _:
                 print("Dato Incorrecto")
         input("\nPulse enter para continuar\n")
@@ -314,7 +318,7 @@ def revisar_jugador_salon_fama(jugadores:list) -> None:
                 print("El jugador {0} no es {1}".format(jugador["nombre"], logro))
 #----------------------------------------------------------------
 
-#PUNTOS 7 , 8 , 9 , 13
+#PUNTOS 7 , 8 , 9 , 13, 14
 def buscar_mayor_jugador_clave(jugadores:list, key_ing:str) -> dict:
     """
     busca al jugador mayor jugador segun la clave
@@ -338,11 +342,11 @@ def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str) -> None:
     if len(jugadores) == 0:
         print("Lista Vacia")
     else:
-        jugador_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar, True)
+        jugador_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar)
         print("Nombre: {0}, {1}: {2}\n".format(jugador_encontrados["nombre"],key_buscar, jugador_encontrados["estadisticas"][key_buscar]))
 #----------------------------------------------------------------
 
-#PUNTO 10, 11, 12, 15 
+#PUNTO 10, 11, 12, 15, 18 
 def jugadores_superioes_promedio_key(jugadores:list, key_buscar:str) -> None:
     """
     pide al usuario un valor y muestra a los jugadores que superen ese valor
