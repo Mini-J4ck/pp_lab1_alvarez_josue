@@ -80,6 +80,8 @@ def menu_principal(lista_jugadores:list) -> None:
                 jugadores_superioes_promedio_key(lista_jugadores, "porcentaje_tiros_libres")
             case 16:
                 promedio_puntos_partido_sin_menor(lista_jugadores, "promedio_puntos_por_partido")
+            case 17:
+                buscar_mostrar_jugador_mayor_logros(lista_jugadores)
             case _:
                 print("Dato Incorrecto")
         input("\nPulse enter para continuar\n")
@@ -312,7 +314,7 @@ def revisar_jugador_salon_fama(jugadores:list) -> None:
                 print("El jugador {0} no es {1}".format(jugador["nombre"], logro))
 #----------------------------------------------------------------
 
-#PUNTOS 7 y 8 y 9
+#PUNTOS 7 , 8 , 9 , 13
 def buscar_mayor_jugador_clave(jugadores:list, key_ing:str) -> dict:
     """
     busca al jugador mayor jugador segun la clave
@@ -336,12 +338,12 @@ def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str) -> None:
     if len(jugadores) == 0:
         print("Lista Vacia")
     else:
-        jugador_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar)
+        jugador_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar, True)
         print("Nombre: {0}, {1}: {2}\n".format(jugador_encontrados["nombre"],key_buscar, jugador_encontrados["estadisticas"][key_buscar]))
 #----------------------------------------------------------------
 
 #PUNTO 10, 11, 12, 15 
-def jugadores_superioes_promedio_key(jugadores:list, key_buscar:str):
+def jugadores_superioes_promedio_key(jugadores:list, key_buscar:str) -> None:
     """
     pide al usuario un valor y muestra a los jugadores que superen ese valor
     recibe una lista con los datos de los jugadores y un string para la clave a ordenar
@@ -361,21 +363,36 @@ def jugadores_superioes_promedio_key(jugadores:list, key_buscar:str):
             print("Nadie supera el valor ingresado")
 #----------------------------------------------------------------
  #PUNTO 16
-def promedio_puntos_partido_sin_menor(jugaderes:list, key_buscar:str):
+def promedio_puntos_partido_sin_menor(jugadores:list, key_buscar:str) -> None:
     """
     saca el promedio de puntos excluyendo al jugador que tenga menos puntos
     recibe una lista con los datos de los jugadores y un string para la clave a ordenar
     no retorna nada solo imprime mensajes
     """
-    if len(jugaderes) == 0:
+    if len(jugadores) == 0:
         print("Lista Vacia")
     else:
-        lista_encontrados = ordenar_segun_key(jugaderes, key_buscar)
+        lista_encontrados = ordenar_segun_key(jugadores, key_buscar)
         jugador_excluido = lista_encontrados[0]
         acumulador = 0
         for jugador in lista_encontrados[1:]:
             acumulador += jugador["estadisticas"][key_buscar]
         promedio = acumulador / len(lista_encontrados[1:])
         print("el {0} es: {1} excluyendo al jugador {2}".format(key_buscar, promedio, jugador_excluido["nombre"]))
+#PUNTO 17
+def buscar_mostrar_jugador_mayor_logros(jugadores:list) -> None:
+    """
+    busca el jugador con la mayor cantidad de logros obtenidos
+    recibe una lista con los jugadores
+    no retorna nada solo imprime un mensaje
+    """
+    if len(jugadores) == 0:
+        print("Lista Vacia")
+    else:
+        for jugador in range(len(jugadores)-1):
+            if len(jugadores[jugador]["logros"]) > len(jugadores[jugador + 1]["logros"]):
+                jugadores[jugador], jugadores[jugador + 1] =  jugadores[jugador + 1], jugadores[jugador]
+        print("El jugador con mayor cantidad de logros es: {0} con {1} logros obtenidos"
+            .format(jugadores[-1]["nombre"], len(jugadores[-1]["logros"])))
 lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
 menu_principal(lista_jugadores)
