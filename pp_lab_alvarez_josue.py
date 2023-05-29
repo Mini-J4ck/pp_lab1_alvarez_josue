@@ -72,6 +72,14 @@ def menu_principal(lista_jugadores:list) -> None:
                 jugadores_superioes_promedio_key(lista_jugadores, "promedio_rebotes_por_partido")
             case 12:
                 jugadores_superioes_promedio_key(lista_jugadores, "promedio_asistencias_por_partido") 
+            case 13:
+                mostrar_jugador__mayor_key(lista_jugadores, "robos_totales")
+            case 14:
+                mostrar_jugador__mayor_key(lista_jugadores, "bloqueos_totales")
+            case 15:
+                jugadores_superioes_promedio_key(lista_jugadores, "porcentaje_tiros_libres")
+            case 16:
+                promedio_puntos_partido_sin_menor(lista_jugadores, "promedio_puntos_por_partido")
             case _:
                 print("Dato Incorrecto")
         input("\nPulse enter para continuar\n")
@@ -137,7 +145,7 @@ def mostrar_estadisticas_jugador(lista_jugadores:list) -> dict:
         listar_jugadores(lista, True)
         id_ingresado = (validar_ingreso_numero(input("ingrese el ID de un jugador: ")))
         while id_ingresado >= len(lista):
-            id_ingresado = (validar_ingreso_numero(input("ingrese el ID de un jugador: ")))    
+            id_ingresado = (validar_ingreso_numero(input("valor incorrecto, ingrese un numero valido: ")))    
         for i in range(len(lista)):
             if i == id_ingresado: 
                 print("Nombre: {0}".format(lista[i]["nombre"]))
@@ -267,10 +275,10 @@ def ordenar_segun_key(lista_jugadores:list, key_buscar:str) -> list:
 #----------------------------------------------------------------
 def mostrar_promedio_puntos_jugadores(jugadores:list) -> None:
     """
-    isando la lista ordenada alfabeticamente muestra el promedio de puntos de cada jugador
+    Usando la lista ordenada alfabeticamente muestra el promedio de puntos de cada jugador
     y al final saca el promedio de puntos de todo el equipo
-    recibe la lista de jugadores
-    no retorna nada solo imprime el promedio
+    Recibe la lista de jugadores
+    No retorna nada solo imprime el promedio
     """
     if len(jugadores) == 0:
         print("Lista Vacia")
@@ -332,20 +340,42 @@ def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str) -> None:
         print("Nombre: {0}, {1}: {2}\n".format(jugador_encontrados["nombre"],key_buscar, jugador_encontrados["estadisticas"][key_buscar]))
 #----------------------------------------------------------------
 
-#PUNTO 10, 11, 12 
+#PUNTO 10, 11, 12, 15 
 def jugadores_superioes_promedio_key(jugadores:list, key_buscar:str):
+    """
+    pide al usuario un valor y muestra a los jugadores que superen ese valor
+    recibe una lista con los datos de los jugadores y un string para la clave a ordenar
+    no retorna nada solo imprime mensajes
+    """
     if len(jugadores) == 0: 
         print("Lista Vacia")
     else:
-        lista_encontrados = ordenar_segun_key(jugadores, key_buscar)
         dato_ingresado = (validar_ingreso_numero(input("ingrese el valor a superar: ")))
         print("los jugadores que superan {0} son:\n".format(dato_ingresado))
         bandera = False
-        for jugador in lista_encontrados:
+        for jugador in jugadores:
             if jugador["estadisticas"][key_buscar] > dato_ingresado:
                 print("Nombre: {0}, {1}: {2}".format(jugador["nombre"], key_buscar, jugador["estadisticas"][key_buscar]))
                 bandera = True
         if bandera == False:
             print("Nadie supera el valor ingresado")
+#----------------------------------------------------------------
+ #PUNTO 16
+def promedio_puntos_partido_sin_menor(jugaderes:list, key_buscar:str):
+    """
+    saca el promedio de puntos excluyendo al jugador que tenga menos puntos
+    recibe una lista con los datos de los jugadores y un string para la clave a ordenar
+    no retorna nada solo imprime mensajes
+    """
+    if len(jugaderes) == 0:
+        print("Lista Vacia")
+    else:
+        lista_encontrados = ordenar_segun_key(jugaderes, key_buscar)
+        jugador_excluido = lista_encontrados[0]
+        acumulador = 0
+        for jugador in lista_encontrados[1:]:
+            acumulador += jugador["estadisticas"][key_buscar]
+        promedio = acumulador / len(lista_encontrados[1:])
+        print("el {0} es: {1} excluyendo al jugador {2}".format(key_buscar, promedio, jugador_excluido["nombre"]))
 lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
 menu_principal(lista_jugadores)
