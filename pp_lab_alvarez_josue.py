@@ -10,10 +10,13 @@ def imprimir_menu_opciones() -> None:
     print("""
     1 - Mostrar la lista de todos los jugadores del Dream Team
     2 - Mostrar estadisticas del jugador
-    3 - guardar en archivo CSV
-    4 - buscar un jugador y mostrar sus logros
-    5 - Buscar héroes por inteligencia
-    6 - Exportar a CSV la lista de héroes ordenada según opción elegida anteriormente
+    3 - Guardar en archivo CSV
+    4 - Buscar un jugador y mostrar sus logros
+    5 - Calcular promedio de puntos ordenados alfabeticamente
+    6 - Verificar si el jugador pertenece al salon de la fama
+    7 - Mostrat al jugador con la mayor cantidad de rebotes totales
+    8 - Mostrar el jugador con el mayor porcentaje de tiros de campo
+    9 - Mostrar el jugador con la mayor cantidad de asistencias totales
     7 - salir
     """)
 #----------------------------------------------------------------
@@ -56,6 +59,10 @@ def menu_principal(lista_jugadores:list) -> None:
                 revisar_jugador_salon_fama(lista_jugadores)    
             case 7:
                 mostrar_jugador__mayor_key(lista_jugadores, "rebotes_totales")
+            case 8:
+                mostrar_jugador__mayor_key(lista_jugadores, "porcentaje_tiros_de_campo")
+            case 9:
+                mostrar_jugador__mayor_key(lista_jugadores, "asistencias_totales")
             case _:
                 print("Dato Incorrecto")
         input("\nPulse enter para continuar\n")
@@ -288,16 +295,32 @@ def revisar_jugador_salon_fama(jugadores:list) -> None:
                 print("El jugador {0} no es {1}".format(jugador["nombre"], logro))
 #----------------------------------------------------------------
 
-#7
-def buscar_mayor_jugador_clave(jugadores:list, key_ing:str):
-    for jugador in range(len(jugadores)-1):
-        if jugadores[jugador]["estadisticas"][key_ing] > jugadores[jugador + 1]["estadisticas"][key_ing]:
-            jugadores[jugador], jugadores[jugador + 1] =  jugadores[jugador + 1], jugadores[jugador]
-    return jugadores[-1]
+#PUNTOS 7 y 8 y 9
+def buscar_mayor_jugador_clave(jugadores:list, key_ing:str) -> dict:
+    """
+    busca al jugador mayor jugador segun la clave
+    recibe la lista de jugadores y un string para la clave a ordenar
+    retorna el diccionario del jugador mayor
+    """
+    if len(jugadores) == 0:
+        print("Lista Vacia")
+    else:
+        for jugador in range(len(jugadores)-1):
+            if jugadores[jugador]["estadisticas"][key_ing] > jugadores[jugador + 1]["estadisticas"][key_ing]:
+                jugadores[jugador], jugadores[jugador + 1] =  jugadores[jugador + 1], jugadores[jugador]
+        return jugadores[-1]
 
-def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str):
-    jugador_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar)
-    print("Nombre: {0}, {1}: {2}\n".format(jugador_encontrados["nombre"],key_buscar, jugador_encontrados["estadisticas"][key_buscar]))
+def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str) -> None:
+    """
+    con el jugador encontrado muestra los datos de la clave
+    recibe una lista y un string para la clave
+    no retorna nada solo imprime un mensaje
+    """
+    if len(jugadores) == 0:
+        print("Lista Vacia")
+    else:
+        jugador_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar)
+        print("Nombre: {0}, {1}: {2}\n".format(jugador_encontrados["nombre"],key_buscar, jugador_encontrados["estadisticas"][key_buscar]))
 
 
 lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
