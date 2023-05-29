@@ -444,5 +444,5 @@ def ordenar_jugadores_posicion_superiores(jugadores:list, key_buscar:str) -> Non
             print("Nadie supera el valor ingresado")
 #----------------------------------------------------------------
 
-lista_jugadores = leer_archivo("dt.json")
+lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
 menu_principal(lista_jugadores)
