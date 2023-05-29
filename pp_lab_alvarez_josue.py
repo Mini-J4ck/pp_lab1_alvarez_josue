@@ -48,7 +48,12 @@ def menu_principal(lista_jugadores:list) -> None:
                     estadisticas_jugador = diccionario
             case 3:
                 print(guardar_estadisticas_jugador(estadisticas_jugador))
-                
+            case 4:
+                mostrar_logros_jugador(lista_jugadores)
+            case 5:
+                mostrar_promedio_puntos_jugadores(lista_jugadores)
+            case 6:
+                revisar_jugador_salon_fama(lista_jugadores)    
             case _:
                 print("Dato Incorrecto")
         input("\nPulse enter para continuar\n")
@@ -65,7 +70,7 @@ def leer_archivo(nombre_archivo:str) -> list[dict]:
         lista_aux = dict["jugadores"]
     return lista_aux
 #----------------------------------------------------------------
-def validar_ingreso(valor_ingreso:str) -> int:
+def validar_ingreso_numero(valor_ingreso:str) -> int:
     """
     revisa que el dato recibido sea solo un numero entero
     recibe un string ingresado por el usuario
@@ -112,9 +117,9 @@ def mostrar_estadisticas_jugador(lista_jugadores:list) -> dict:
     else:
         lista = lista_jugadores[:]
         listar_jugadores(lista, True)
-        id_ingresado = (validar_ingreso(input("ingrese el ID de un jugador: ")))
+        id_ingresado = (validar_ingreso_numero(input("ingrese el ID de un jugador: ")))
         while id_ingresado >= len(lista):
-            id_ingresado = (validar_ingreso(input("ingrese el ID de un jugador: ")))    
+            id_ingresado = (validar_ingreso_numero(input("ingrese el ID de un jugador: ")))    
         for i in range(len(lista)):
             if i == id_ingresado: 
                 print("Nombre: {0}".format(lista[i]["nombre"]))
@@ -162,6 +167,121 @@ def guardar_estadisticas_jugador(estadisticas_jugador:list) -> bool:
                         estadisticas_jugador["estadisticas"]["porcentaje_tiros_triples"]
                         )
             archivo.write(mensaje)
+            print("se creo el archivo datos_jugador_{0}.csv".format(estadisticas_jugador["nombre"]))
             return True
+#----------------------------------------------------------------
+
+#PUNTO 4
+def validar_ingreso_palabras(cadena_ingreso:str) -> str:
+    """
+    revisa que la cadena ingresada sea solo letras si no lo es pide al usuario
+    recibe un string
+    retorna una cadena que cumpla con ser solo letras 
+    """
+    while True:
+        if re.match(r"^[a-zA-Z]+$", cadena_ingreso):
+            return cadena_ingreso
+        else:
+            cadena_ingreso = input("ingrese un nombre: ")
+#----------------------------------------------------------------
+def buscar_jugador_nombre(jugadores:list[dict]) -> list:
+    """
+    le pide al usuario un nombre y si coinciden agrega el diccionario del jugador a una lista
+    recibe una lista de jugadores
+    retorna una lista con los jugadores que contengan el dato ingresado
+    """
+    nombre_ing = validar_ingreso_palabras(input("ingrese un nombre: "))
+    nombre_ing = re.compile(nombre_ing, re.IGNORECASE)
+    lista_aux = []
+    bandera = False
+    for i in jugadores:
+        if re.match(nombre_ing, i["nombre"]):
+            lista_aux.append(i)
+            bandera = True
+    if bandera == False:
+        return 0
+    else:
+        return lista_aux
+#----------------------------------------------------------------
+def mostrar_logros_jugador(jugadores:list) -> None:
+    """
+    muestra los logros de los jugadores encontrados (si los hay)
+    recibe una lista de jugadores
+    no retorna nada solo imprime 
+    """
+    if len(jugadores) == 0:
+        print("Lista Vacia")
+    else:
+        lista_encontrados = buscar_jugador_nombre(jugadores)
+        if lista_encontrados == 0:
+            print("No existe un jugador con el valor ingresado")
+        else:
+            for i in lista_encontrados:
+                print("Nombre: {0}".format(i["nombre"]))
+                print("Logros: \n{0}\n".format("\n".join(i["logros"])))
+#----------------------------------------------------------------
+
+#PUNTO 5
+def ordenar_segun_key(lista_jugadores:list, key_buscar:str) -> list:
+    """
+    ordena la lista de jugadores segun la clave que puede ser el nombre o alguna estadistica
+    recibe una lista con los jugadores y un string para la clave a ordenar
+    retorna una lista ordenada
+    """
+    if len(lista_jugadores) <= 1:
+        return lista_jugadores
+    else:
+        jugadores = lista_jugadores[:]
+        lista_iz = []
+        lista_der = []
+        pivot = jugadores[0]
+        for jugador in jugadores[1:]:
+            if key_buscar == "nombre" and jugador[key_buscar] <= pivot[key_buscar] \
+                  or  key_buscar != "nombre" and jugador["estadisticas"][key_buscar] <= pivot["estadisticas"][key_buscar]:
+                lista_iz.append(jugador)
+            else:
+                lista_der.append(jugador)
+        lista_iz = ordenar_segun_key(lista_iz, key_buscar)
+        lista_iz.append(pivot)
+        lista_der = ordenar_segun_key(lista_der, key_buscar)
+        lista_iz.extend(lista_der)
+        return lista_iz
+#----------------------------------------------------------------
+def mostrar_promedio_puntos_jugadores(jugadores:list) -> None:
+    """
+    isando la lista ordenada alfabeticamente muestra el promedio de puntos de cada jugador
+    y al final saca el promedio de puntos de todo el equipo
+    recibe la lista de jugadores
+    no retorna nada solo imprime el promedio
+    """
+    if len(jugadores) == 0:
+        print("Lista Vacia")
+    else:
+        lista_jugadores = ordenar_segun_key(jugadores, "nombre")
+        acumulador = 0
+        for i in lista_jugadores:
+            print("Nombre: {0}, Promedio puntos por partido: {1}".format(i["nombre"], i["estadisticas"]["promedio_puntos_por_partido"]))
+            acumulador += i["estadisticas"]["promedio_puntos_por_partido"]
+            promedio = acumulador / len(jugadores)
+        print("El promedio de puntos por partido del equipo es: {0}".format(promedio))
+#----------------------------------------------------------------
+
+#PUNTO 6
+def revisar_jugador_salon_fama(jugadores:list) -> None:
+    """
+    busca en los logros de el o los jugadores si pertenecen al salon de la fama
+    recibe una lista de jugadores
+    no retorna nada
+    """
+    if len(jugadores) == 0:
+        return 0
+    else:
+        lista_encontrados = buscar_jugador_nombre(jugadores)
+        for jugador in lista_encontrados:
+            if re.search("Miembro", jugador["logros"][-1]):
+                print("El jugador {0} es {1}".format(jugador["nombre"], jugador["logros"][-1]))
+            else:
+                print("El jugador {0} no es {1}".format(jugador["nombre"], jugador["logros"][-1]))
+
 lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
 menu_principal(lista_jugadores)
