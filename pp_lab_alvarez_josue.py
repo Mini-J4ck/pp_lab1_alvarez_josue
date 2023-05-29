@@ -33,13 +33,13 @@ def imprimir_menu_opciones() -> None:
 #----------------------------------------------------------------
 def validar_opcion_menu_principal() -> str | int:
     """
-    imprime el menu, pide un caracter y lo valida en un rango de 1 a 20 (incluye ademas el 23)
+    imprime el menu, pide un caracter y lo valida en un rango de 1 a 20 (incluye el 24 para salir)
     no recibe nada
     retorna el caracter convertido a entero si es valido, sino el valor -1
     """
     imprimir_menu_opciones()
     valor_ingresado = input("ingrese una opcion: ")
-    if re.match(r"^(1?[0-9]|20|23|24)$", valor_ingresado):
+    if re.match(r"^(1?[0-9]|20|24)$", valor_ingresado):
         return int(valor_ingresado)
     else:
         return -1
@@ -240,7 +240,7 @@ def buscar_jugador_nombre(jugadores:list[dict]) -> list:
     lista_aux = []
     bandera = False
     for i in jugadores:
-        if re.match(nombre_ing, i["nombre"]):
+        if re.search(nombre_ing, i["nombre"]):
             lista_aux.append(i)
             bandera = True
     if bandera == False:
@@ -332,7 +332,7 @@ def revisar_jugador_salon_fama(jugadores:list) -> None:
 #----------------------------------------------------------------
 
 #PUNTOS 7 , 8 , 9 , 13, 14, 19
-def buscar_mayor_jugador_clave(jugadores:list, key_ing:str) -> dict:
+def buscar_mayor_jugador_clave(jugadores:list, key_buscar:str) -> dict:
     """
     busca al jugador mayor jugador segun la clave
     recibe la lista de jugadores y un string para la clave a ordenar
@@ -341,23 +341,28 @@ def buscar_mayor_jugador_clave(jugadores:list, key_ing:str) -> dict:
     if len(jugadores) == 0:
         print("Lista Vacia")
     else:
-        for jugador in range(len(jugadores)-1):
-            if jugadores[jugador]["estadisticas"][key_ing] > jugadores[jugador + 1]["estadisticas"][key_ing]:
-                jugadores[jugador], jugadores[jugador + 1] =  jugadores[jugador + 1], jugadores[jugador]
-        return jugadores[-1]
+        lista_ord = ordenar_segun_key(jugadores, key_buscar)
+        lista_aux = []
+        valor_mayor = lista_ord[-1]
+        lista_aux.append(valor_mayor)
+        for i in lista_ord[:-1]:
+            if i["estadisticas"][key_buscar] == valor_mayor["estadisticas"][key_buscar]:
+                lista_aux.append(i)
+        return lista_aux
 #----------------------------------------------------------------
 
 def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str) -> None:
     """
-    Con el jugador encontrado muestra los datos de la clave
+    Con el o los jugadore encontrados muestra los datos de la clave
     Recibe una lista y un string para la clave
     No retorna nada solo imprime un mensaje
     """
     if len(jugadores) == 0:
         print("Lista Vacia")
     else:
-        jugador_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar)
-        print("Nombre: {0}, {1}: {2}\n".format(jugador_encontrados["nombre"],key_buscar, jugador_encontrados["estadisticas"][key_buscar]))
+        jugadores_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar)
+        for jugador in jugadores_encontrados:
+            print("Nombre: {0}, {1}: {2}".format(jugador["nombre"],key_buscar, jugador["estadisticas"][key_buscar]))
 #----------------------------------------------------------------
 
 #PUNTO 10, 11, 12, 15, 18 
@@ -437,5 +442,7 @@ def ordenar_jugadores_posicion_superiores(jugadores:list, key_buscar:str) -> Non
                 bandera = True
         if bandera == False:
             print("Nadie supera el valor ingresado")
-lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
+#----------------------------------------------------------------
+
+lista_jugadores = leer_archivo("dt.json")
 menu_principal(lista_jugadores)
