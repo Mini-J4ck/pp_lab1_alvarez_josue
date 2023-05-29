@@ -20,7 +20,15 @@ def imprimir_menu_opciones() -> None:
     10 - Mostrar los jugadores que han promediado más puntos por partido
     11 - Mostrar los jugadores que han promediado más rebotes por partido
     12 - Mostrar los jugadores que han promediado más asistencias por partido
-    7 - salir
+    13 - Mostrar el jugador con la mayor cantidad de robos totales
+    14 - Mostrar el jugador con la mayor cantidad de bloqueos totales
+    15 - Mostrar los jugadores que hayan tenido un porcentaje de tiros libres superior 
+    16 - Mostrar el promedio de puntos por partido del equipo excluyendo al jugador con la menor cantidad de puntos por partido
+    17 - Mostrar el jugador con la mayor cantidad de logros obtenidos
+    18 - Mostrar los jugadores que hayan tenido un porcentaje de tiros triples superior
+    19 - Mostrar el jugador con la mayor cantidad de temporadas jugadas
+    20 - Mostrar los jugadores , ordenados por posición en la cancha, que hayan tenido un porcentaje de tiros de campo superior
+    24 - salir
     """)
 #----------------------------------------------------------------
 def validar_opcion_menu_principal() -> str | int:
@@ -31,7 +39,7 @@ def validar_opcion_menu_principal() -> str | int:
     """
     imprimir_menu_opciones()
     valor_ingresado = input("ingrese una opcion: ")
-    if re.match(r"^(1?[0-9]|20|23)$", valor_ingresado):
+    if re.match(r"^(1?[0-9]|20|23|24)$", valor_ingresado):
         return int(valor_ingresado)
     else:
         return -1
@@ -86,6 +94,11 @@ def menu_principal(lista_jugadores:list) -> None:
                 jugadores_superioes_promedio_key(lista_jugadores, "porcentaje_tiros_triples")
             case 19:
                 mostrar_jugador__mayor_key(lista_jugadores, "temporadas")
+            case 20:
+                ordenar_jugadores_posicion_superiores(lista_jugadores, "porcentaje_tiros_de_campo")
+            case 24:
+                print("hasta pronto")
+                break
             case _:
                 print("Dato Incorrecto")
         input("\nPulse enter para continuar\n")
@@ -268,8 +281,8 @@ def ordenar_segun_key(lista_jugadores:list, key_buscar:str) -> list:
         lista_der = []
         pivot = jugadores[0]
         for jugador in jugadores[1:]:
-            if key_buscar == "nombre" and jugador[key_buscar] <= pivot[key_buscar] \
-                  or  key_buscar != "nombre" and jugador["estadisticas"][key_buscar] <= pivot["estadisticas"][key_buscar]:
+            if (key_buscar == "nombre" or key_buscar == "posicion") and jugador[key_buscar] <= pivot[key_buscar] \
+                  or  (key_buscar != "nombre" and key_buscar != "posicion") and jugador["estadisticas"][key_buscar] <= pivot["estadisticas"][key_buscar]:           
                 lista_iz.append(jugador)
             else:
                 lista_der.append(jugador)
@@ -318,7 +331,7 @@ def revisar_jugador_salon_fama(jugadores:list) -> None:
                 print("El jugador {0} no es {1}".format(jugador["nombre"], logro))
 #----------------------------------------------------------------
 
-#PUNTOS 7 , 8 , 9 , 13, 14
+#PUNTOS 7 , 8 , 9 , 13, 14, 19
 def buscar_mayor_jugador_clave(jugadores:list, key_ing:str) -> dict:
     """
     busca al jugador mayor jugador segun la clave
@@ -333,6 +346,7 @@ def buscar_mayor_jugador_clave(jugadores:list, key_ing:str) -> dict:
                 jugadores[jugador], jugadores[jugador + 1] =  jugadores[jugador + 1], jugadores[jugador]
         return jugadores[-1]
 #----------------------------------------------------------------
+
 def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str) -> None:
     """
     Con el jugador encontrado muestra los datos de la clave
@@ -366,6 +380,7 @@ def jugadores_superioes_promedio_key(jugadores:list, key_buscar:str) -> None:
         if bandera == False:
             print("Nadie supera el valor ingresado")
 #----------------------------------------------------------------
+
  #PUNTO 16
 def promedio_puntos_partido_sin_menor(jugadores:list, key_buscar:str) -> None:
     """
@@ -383,6 +398,8 @@ def promedio_puntos_partido_sin_menor(jugadores:list, key_buscar:str) -> None:
             acumulador += jugador["estadisticas"][key_buscar]
         promedio = acumulador / len(lista_encontrados[1:])
         print("el {0} es: {1} excluyendo al jugador {2}".format(key_buscar, promedio, jugador_excluido["nombre"]))
+#----------------------------------------------------------------
+
 #PUNTO 17
 def buscar_mostrar_jugador_mayor_logros(jugadores:list) -> None:
     """
@@ -398,5 +415,27 @@ def buscar_mostrar_jugador_mayor_logros(jugadores:list) -> None:
                 jugadores[jugador], jugadores[jugador + 1] =  jugadores[jugador + 1], jugadores[jugador]
         print("El jugador con mayor cantidad de logros es: {0} con {1} logros obtenidos"
             .format(jugadores[-1]["nombre"], len(jugadores[-1]["logros"])))
+#----------------------------------------------------------------
+
+#20
+def ordenar_jugadores_posicion_superiores(jugadores:list, key_buscar:str) -> None:
+    """
+    Pide al usuario un valor y muestra los jugadores que lo superen ordenados segun su posicion
+    recibe una lista con los datos de los jugadores y un string para la clave a ordenar
+    no retorna nada solo imprime mensajes
+    """
+    if len(jugadores) == 0:
+        print("Lista Vacia")
+    else:
+        lista_encontrados = ordenar_segun_key(jugadores, "posicion")
+        dato_ingresado = (validar_ingreso_numero(input("ingrese el valor a superar: ")))
+        print("los jugadores que superan {0} son:\n".format(dato_ingresado))
+        bandera = False
+        for jugador in lista_encontrados:
+            if jugador["estadisticas"][key_buscar] > dato_ingresado:
+                print("Nombre: {0}, Posicion: {1}, {2}: {3}".format(jugador["nombre"],jugador["posicion"], key_buscar, jugador["estadisticas"][key_buscar]))
+                bandera = True
+        if bandera == False:
+            print("Nadie supera el valor ingresado")
 lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
 menu_principal(lista_jugadores)
