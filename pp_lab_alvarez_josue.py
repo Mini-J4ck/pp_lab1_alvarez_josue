@@ -69,11 +69,11 @@ def menu_principal(lista_jugadores:list) -> None:
             case 6:
                 revisar_jugador_salon_fama(lista_jugadores)    
             case 7:
-                mostrar_jugador__mayor_key(lista_jugadores, "rebotes_totales")
+                mostrar_jugador__mayor_menor_key(lista_jugadores, "rebotes_totales", True)
             case 8:
-                mostrar_jugador__mayor_key(lista_jugadores, "porcentaje_tiros_de_campo")
+                mostrar_jugador__mayor_menor_key(lista_jugadores, "porcentaje_tiros_de_campo", True)
             case 9:
-                mostrar_jugador__mayor_key(lista_jugadores, "asistencias_totales")
+                mostrar_jugador__mayor_menor_key(lista_jugadores, "asistencias_totales", True)
             case 10:
                 jugadores_superioes_promedio_key(lista_jugadores, "promedio_puntos_por_partido")
             case 11:
@@ -81,9 +81,9 @@ def menu_principal(lista_jugadores:list) -> None:
             case 12:
                 jugadores_superioes_promedio_key(lista_jugadores, "promedio_asistencias_por_partido") 
             case 13:
-                mostrar_jugador__mayor_key(lista_jugadores, "robos_totales")
+                mostrar_jugador__mayor_menor_key(lista_jugadores, "robos_totales", True)
             case 14:
-                mostrar_jugador__mayor_key(lista_jugadores, "bloqueos_totales")
+                mostrar_jugador__mayor_menor_key(lista_jugadores, "bloqueos_totales", True)
             case 15:
                 jugadores_superioes_promedio_key(lista_jugadores, "porcentaje_tiros_libres")
             case 16:
@@ -93,7 +93,7 @@ def menu_principal(lista_jugadores:list) -> None:
             case 18:
                 jugadores_superioes_promedio_key(lista_jugadores, "porcentaje_tiros_triples")
             case 19:
-                mostrar_jugador__mayor_key(lista_jugadores, "temporadas")
+                mostrar_jugador__mayor_menor_key(lista_jugadores, "temporadas", True)
             case 20:
                 ordenar_jugadores_posicion_superiores(lista_jugadores, "porcentaje_tiros_de_campo")
             case 24:
@@ -332,10 +332,10 @@ def revisar_jugador_salon_fama(jugadores:list) -> None:
 #----------------------------------------------------------------
 
 #PUNTOS 7 , 8 , 9 , 13, 14, 19
-def buscar_mayor_jugador_clave(jugadores:list, key_buscar:str) -> dict:
+def buscar_mayor_jugador_clave(jugadores:list, key_buscar:str, valor_orden:bool) -> dict:
     """
     busca al jugador mayor jugador segun la clave
-    recibe la lista de jugadores y un string para la clave a ordenar
+    recibe la lista de jugadores, un string para la clave a ordenar y un boolean para el mayor o menor
     retorna el diccionario del jugador mayor
     """
     if len(jugadores) == 0:
@@ -343,24 +343,29 @@ def buscar_mayor_jugador_clave(jugadores:list, key_buscar:str) -> dict:
     else:
         lista_ord = ordenar_segun_key(jugadores, key_buscar)
         lista_aux = []
-        valor_mayor = lista_ord[-1]
-        lista_aux.append(valor_mayor)
-        for i in lista_ord[:-1]:
-            if i["estadisticas"][key_buscar] == valor_mayor["estadisticas"][key_buscar]:
+        if valor_orden == True:
+            valor_mayor_menor = lista_ord[-1]
+            lista_ord = lista_ord[:-1]
+        else:
+            valor_mayor_menor = lista_ord[0]
+            lista_ord = lista_ord[1:]
+        lista_aux.append(valor_mayor_menor)
+        for i in lista_ord:
+            if i["estadisticas"][key_buscar] == valor_mayor_menor["estadisticas"][key_buscar]:
                 lista_aux.append(i)
         return lista_aux
 #----------------------------------------------------------------
 
-def mostrar_jugador__mayor_key(jugadores:list, key_buscar:str) -> None:
+def mostrar_jugador__mayor_menor_key(jugadores:list, key_buscar:str, valor_orden:bool) -> None:
     """
     Con el o los jugadore encontrados muestra los datos de la clave
-    Recibe una lista y un string para la clave
+    Recibe una lista y un string para la clave y un boolean para el mayor o menor
     No retorna nada solo imprime un mensaje
     """
     if len(jugadores) == 0:
         print("Lista Vacia")
     else:
-        jugadores_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar)
+        jugadores_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar, valor_orden)
         for jugador in jugadores_encontrados:
             print("Nombre: {0}, {1}: {2}".format(jugador["nombre"],key_buscar, jugador["estadisticas"][key_buscar]))
 #----------------------------------------------------------------
@@ -375,7 +380,7 @@ def jugadores_superioes_promedio_key(jugadores:list, key_buscar:str) -> None:
     if len(jugadores) == 0: 
         print("Lista Vacia")
     else:
-        dato_ingresado = (validar_ingreso_numero(input("ingrese el valor a superar: ")))
+        dato_ingresado = (validar_ingreso_numero(input("ingrese el valor a comparar: ")))
         print("los jugadores que superan {0} son:\n".format(dato_ingresado))
         bandera = False
         for jugador in jugadores:
