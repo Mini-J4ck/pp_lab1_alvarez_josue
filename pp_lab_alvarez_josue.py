@@ -28,7 +28,10 @@ def imprimir_menu_opciones() -> None:
     18 - Mostrar los jugadores que hayan tenido un porcentaje de tiros triples superior
     19 - Mostrar el jugador con la mayor cantidad de temporadas jugadas
     20 - Mostrar los jugadores , ordenados por posición en la cancha, que hayan tenido un porcentaje de tiros de campo superior
-    24 - salir
+    21 - Determinar la cantidad de jugadores que hay por cada posición
+    22 - Mostrar la lista de jugadores ordenadas por la cantidad de All-Star de forma descendente
+    24 - Determinar qué jugador tiene las mejores estadísticas en cada valor
+    26 - salir
     """)
 #----------------------------------------------------------------
 def validar_opcion_menu_principal() -> str | int:
@@ -39,7 +42,7 @@ def validar_opcion_menu_principal() -> str | int:
     """
     imprimir_menu_opciones()
     valor_ingresado = input("ingrese una opcion: ")
-    if re.match(r"^(1?[0-9]|20|24)$", valor_ingresado):
+    if re.match(r"^([0-9]{1,2})$", valor_ingresado):
         return int(valor_ingresado)
     else:
         return -1
@@ -96,7 +99,17 @@ def menu_principal(lista_jugadores:list) -> None:
                 mostrar_jugador__mayor_menor_key(lista_jugadores, "temporadas", True)
             case 20:
                 ordenar_jugadores_posicion_superiores(lista_jugadores, "porcentaje_tiros_de_campo")
+            case 21:
+                mostrar_cantidad_jugadores_posicion(lista_jugadores)
+            case 22:
+                mostrar_jugadores_cantidad_all_star(lista_jugadores)
+            case 23:
+                pass
             case 24:
+                mostrar_jugador_mejor_estadisticas(lista_jugadores)
+            case 25:
+                pass
+            case 26:
                 print("hasta pronto")
                 break
             case _:
@@ -138,7 +151,7 @@ def listar_jugadores(lista:list, id_jugador:bool) -> None:
     no retorna nada
     """
     if len(lista) == 0:
-        print("Error lista vacia")
+        print("Error Error: lista vacia")
     else:
         lista_jugadores = lista[:]
         if id_jugador == False:
@@ -157,7 +170,7 @@ def mostrar_estadisticas_jugador(lista_jugadores:list) -> dict:
     devuelve un diccionario con las estadisticas del jugador escogido
     """
     if len(lista_jugadores) == 0:
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
         return 0
     else:
         lista = lista_jugadores[:]
@@ -224,7 +237,7 @@ def validar_ingreso_palabras(cadena_ingreso:str) -> str:
     retorna una cadena que cumpla con ser solo letras 
     """
     while True:
-        if re.match(r"^[a-zA-Z]+$", cadena_ingreso):
+        if re.match(r"^[a-zA-Z]+ ?[a-zA-Z]*$", cadena_ingreso):
             return cadena_ingreso
         else:
             cadena_ingreso = input("ingrese un nombre: ")
@@ -255,15 +268,17 @@ def mostrar_logros_jugador(jugadores:list) -> None:
     no retorna nada solo imprime 
     """
     if len(jugadores) == 0:
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
     else:
         lista_encontrados = buscar_jugador_nombre(jugadores)
         if lista_encontrados == 0:
             print("No existe un jugador con el valor ingresado")
         else:
             for i in lista_encontrados:
+                print("-"*30)
                 print("Nombre: {0}".format(i["nombre"]))
                 print("Logros: \n{0}\n".format("\n".join(i["logros"])))
+                print("-"*30)
 #----------------------------------------------------------------
 
 #PUNTO 5
@@ -300,14 +315,14 @@ def mostrar_promedio_puntos_jugadores(jugadores:list) -> None:
     No retorna nada solo imprime el promedio
     """
     if len(jugadores) == 0:
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
     else:
         lista_jugadores = ordenar_segun_key(jugadores, "nombre")
         acumulador = 0
         for i in lista_jugadores:
             print("Nombre: {0}, Promedio puntos por partido: {1}".format(i["nombre"], i["estadisticas"]["promedio_puntos_por_partido"]))
             acumulador += i["estadisticas"]["promedio_puntos_por_partido"]
-            promedio = acumulador / len(jugadores)
+        promedio = acumulador / len(jugadores)
         print("El promedio de puntos por partido del equipo es: {0}".format(promedio))
 #----------------------------------------------------------------
 
@@ -319,13 +334,12 @@ def revisar_jugador_salon_fama(jugadores:list) -> None:
     no retorna nada
     """
     if len(jugadores) == 0:
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
     else:
         lista_encontrados = buscar_jugador_nombre(jugadores)
-        logro = "Miembro del Salon de la Fama del Baloncesto"
+        logro = "Defensor del Año en la NBA en 1988"
         for jugador in lista_encontrados:
-            
-            if re.search(r"^"+  re.escape(logro) +"$", jugador["logros"][-1]):
+            if logro in jugador["logros"]:
                 print("El jugador {0} es {1}".format(jugador["nombre"], logro))
             else:
                 print("El jugador {0} no es {1}".format(jugador["nombre"], logro))
@@ -339,7 +353,7 @@ def buscar_mayor_jugador_clave(jugadores:list, key_buscar:str, valor_orden:bool)
     retorna el diccionario del jugador mayor
     """
     if len(jugadores) == 0:
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
     else:
         lista_ord = ordenar_segun_key(jugadores, key_buscar)
         lista_aux = []
@@ -363,7 +377,7 @@ def mostrar_jugador__mayor_menor_key(jugadores:list, key_buscar:str, valor_orden
     No retorna nada solo imprime un mensaje
     """
     if len(jugadores) == 0:
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
     else:
         jugadores_encontrados = buscar_mayor_jugador_clave(jugadores, key_buscar, valor_orden)
         for jugador in jugadores_encontrados:
@@ -378,7 +392,7 @@ def jugadores_superioes_promedio_key(jugadores:list, key_buscar:str) -> None:
     no retorna nada solo imprime mensajes
     """
     if len(jugadores) == 0: 
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
     else:
         dato_ingresado = (validar_ingreso_numero(input("ingrese el valor a comparar: ")))
         print("los jugadores que superan {0} son:\n".format(dato_ingresado))
@@ -399,7 +413,7 @@ def promedio_puntos_partido_sin_menor(jugadores:list, key_buscar:str) -> None:
     no retorna nada solo imprime mensajes
     """
     if len(jugadores) == 0:
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
     else:
         lista_encontrados = ordenar_segun_key(jugadores, key_buscar)
         jugador_excluido = lista_encontrados[0]
@@ -418,7 +432,7 @@ def buscar_mostrar_jugador_mayor_logros(jugadores:list) -> None:
     no retorna nada solo imprime un mensaje
     """
     if len(jugadores) == 0:
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
     else:
         for jugador in range(len(jugadores)-1):
             if len(jugadores[jugador]["logros"]) > len(jugadores[jugador + 1]["logros"]):
@@ -435,7 +449,7 @@ def ordenar_jugadores_posicion_superiores(jugadores:list, key_buscar:str) -> Non
     no retorna nada solo imprime mensajes
     """
     if len(jugadores) == 0:
-        print("Lista Vacia")
+        print("Error: Lista Vacia")
     else:
         lista_encontrados = ordenar_segun_key(jugadores, "posicion")
         dato_ingresado = (validar_ingreso_numero(input("ingrese el valor a superar: ")))
@@ -448,6 +462,145 @@ def ordenar_jugadores_posicion_superiores(jugadores:list, key_buscar:str) -> Non
         if bandera == False:
             print("Nadie supera el valor ingresado")
 #----------------------------------------------------------------
+
+#extras
+#21
+def cantidad_jugadores_posicion(jugadores:list) -> dict:
+    """
+    crea un diccionario en el que cuenta los jugadores segun su posicion de juego
+    recibe una lista con los datos de los jugadores
+    retorna un diccionario con las cantidades de posiciones
+    """
+    if len(jugadores) == 0:
+        print("Error: Lista Vacia")
+    else:
+        diccionario = {}
+        for jugador in jugadores:
+            if jugador["posicion"] in diccionario:
+                diccionario[jugador["posicion"]] += 1       
+            else:
+                diccionario[jugador["posicion"]] = 1
+        return diccionario
+#----------------------------------------------------------------
+def mostrar_cantidad_jugadores_posicion(jugadores:list) -> None:
+    """
+    genera un diccionario con las cantidades de posiciones y lo imprime 
+    recibe una lista con los datos de los jugadores
+    No retorna nada solo imprime las posiciones
+    """
+    if len(jugadores) == 0:
+        print("Error: Lista Vacia")
+    else:
+        cantidades_encontradas = cantidad_jugadores_posicion(jugadores)
+        print("Cantidad de posiciones en el Team Dream")
+        for posicion, valor in cantidades_encontradas.items():
+            print("{0}: {1}".format(posicion, valor))
+#----------------------------------------------------------------
+
+#22
+def jugador_cantidad_all_star(jugador:dict) -> list:
+    """
+    recorre la lista de logros buscando "[0-9] veces All-Star" 
+    recibe un diccionario con los datos del jugador
+    retorna el logro All-Star
+    """
+    bandera = False
+    for logro in jugador["logros"]:
+        if re.search(r"[0-9]{1,2} veces All-Star", logro):
+            valor_encontrado = logro
+            bandera = True
+            break
+    if bandera == False:
+        valor_encontrado = "0 veces All-Star"
+    return valor_encontrado
+#----------------------------------------------------------------
+def encontrar_numero(frase:str) -> int:
+    """
+    esta funcion se encarga de buscar los numeros en un string y los convierte a entero
+    recibe un string que es el logro encontrado
+    retorna un numero 
+    """
+    if type(frase) == str:
+        valor = re.findall(r"[0-9]+", frase)
+        return int("".join(valor))
+    else:
+        print("No es un string")
+        return -1
+#----------------------------------------------------------------    
+
+def ordenar_lista_logros(jugadores:list) -> list:
+    """
+    ordena la lista de jugadores en base a la cantidad de All-Star
+    recibe una lista con los jugadores
+    retorna una lista ordenada 
+    """
+    if len(jugadores) <= 1:
+        return jugadores
+    else:
+        lista_i = []
+        lista_d = []
+        pivot = jugadores[0]
+        valor_b = jugador_cantidad_all_star(pivot)
+        valor_b = encontrar_numero(valor_b)
+        for jugador in jugadores[1:]:
+            valor_a = jugador_cantidad_all_star(jugador)
+            valor_a = encontrar_numero(valor_a)
+            if valor_b < valor_a:
+                lista_i.append(jugador)
+            else:
+                lista_d.append(jugador)
+        lista_i = ordenar_lista_logros(lista_i)
+        lista_i.append(pivot)
+        lista_d = ordenar_lista_logros(lista_d)
+        lista_i.extend(lista_d)
+        return lista_i
+#----------------------------------------------------------------   
+def mostrar_jugadores_cantidad_all_star(jugadores:list) -> None:
+    """
+    recorre la lista ordenada de jugadores para mostrar los nombres y cantidades de all stars
+    recibe la lista de jugadores
+    no retorna nada solo imprime 
+    """
+    if len(jugadores) == 0:
+        print("Error: Lista Vacia")
+    else:
+        lista_ord = ordenar_lista_logros(jugadores)
+        for i in lista_ord:
+            star = jugador_cantidad_all_star(i)
+            print("{0} ({1})".format(i["nombre"], star))
+#----------------------------------------------------------------
+
+#3
+def jugador_mejores_caracteristicas(jugadores:list) -> list:
+    """
+    Usando las claves de estadisticas y la funcion ordenar_segun_key obtiene el mejor jugador de X clave
+    para guardarlo en una lista con el formato requerido.
+    Recibe una lista de jugadores.
+    Retorna una lista con los jugadores Nro 1.
+    """
+    claves = jugadores[0]["estadisticas"].keys()
+    lista_maximos_por_clave = []
+    for clave in claves:
+        lista_ord = ordenar_segun_key(jugadores, clave)
+        jugador_maximo = lista_ord[-1]
+        mensaje = "Mayor cantidad de {0}: {1} ({2})".format(
+            clave, jugador_maximo["nombre"], jugador_maximo["estadisticas"][clave])
+        lista_maximos_por_clave.append(mensaje)
+    return lista_maximos_por_clave
+#----------------------------------------------------------------
+def mostrar_jugador_mejor_estadisticas(jugadores:list) -> None:
+    """
+    Imprime la lista con los mejores jugadores en cada clave de estadisticas
+    recibe la lista de jugadores
+    no retorna nada solo imprime
+    """
+    if len(jugadores) == 0:
+        print("Error: Lista Vacia")
+    else:
+        lista = jugador_mejores_caracteristicas(jugadores)
+        for jugador in lista:
+            print(jugador)
+
 
 lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
 menu_principal(lista_jugadores)
