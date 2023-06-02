@@ -104,11 +104,11 @@ def menu_principal(lista_jugadores:list) -> None:
             case 22:
                 mostrar_jugadores_cantidad_all_star(lista_jugadores)
             case 23:
-                pass
+                guardar_ranking_csv(lista_jugadores)
             case 24:
                 mostrar_jugador_mejor_estadisticas(lista_jugadores)
             case 25:
-                pass
+                mostrar_jugador_maximo(lista_jugadores)
             case 26:
                 print("hasta pronto")
                 break
@@ -570,7 +570,48 @@ def mostrar_jugadores_cantidad_all_star(jugadores:list) -> None:
             print("{0} ({1})".format(i["nombre"], star))
 #----------------------------------------------------------------
 
-#3
+#23
+def calcular_rankings_jugadores(jugadores:list) -> list:
+    """
+
+    recibe la lista de jugadores
+    retorna una lista con las posiciones
+    """
+    keys_buscar = ["puntos_totales", "rebotes_totales", "asistencias_totales", "robos_totales"]
+    lista_aux = []
+    for jugador in jugadores:
+        lista = []
+        for key in keys_buscar:
+            lista_or = ordenar_segun_key(jugadores, key)
+            lista_or = lista_or[::-1]
+            for i in range(len(lista_or)):
+                if jugador["nombre"] == lista_or[i]["nombre"]:
+                    mensaje = "{0}".format(i+1)
+                    lista.append(mensaje)
+                    break
+        lista_aux.append(lista)
+    return lista_aux
+
+def mostrar_ranking(jugadores:list):
+    lista_ran = calcular_rankings_jugadores(jugadores)
+    lista_aux = []
+    for i in range(len(jugadores)):
+        mensaje = "{0} {1}".format(jugadores[i]["nombre"], ",".join(lista_ran[i]))
+        lista_aux.append(mensaje)
+    return lista_aux
+
+def guardar_ranking_csv(jugadores:list):
+    if len(jugadores) == 0:
+        print("Error Lista Vacia")
+    else:
+        lista_jugadores = mostrar_ranking(jugadores)
+        with open("Parcial_op\pp_lab1_alvarez_josue\\ranking_jugadores.csv", "w", encoding="utf-8") as archivo:
+            lista_columnas = ["Jugador","Puntos","Rebotes","Asistencias","Robos\n"]
+            archivo.writelines(",".join(lista_columnas))
+            archivo.writelines("\n".join(lista_jugadores))
+        print("Se creo correctamente el archivo: ranking_jugadores.csv")
+
+#24
 def jugador_mejores_caracteristicas(jugadores:list) -> list:
     """
     Usando las claves de estadisticas y la funcion ordenar_segun_key obtiene el mejor jugador de X clave
@@ -600,7 +641,30 @@ def mostrar_jugador_mejor_estadisticas(jugadores:list) -> None:
         lista = jugador_mejores_caracteristicas(jugadores)
         for jugador in lista:
             print(jugador)
+#----------------------------------------------------------------
 
+#25
+def jugador_maximo_caracteristicas(jugadores:list):
+    lista_aux = []
+    for jugador in jugadores:
+        acumulador = 0
+        print(jugador["nombre"])
+        for valor in jugador["estadisticas"].values():
+            acumulador += valor
+        print(acumulador)
+        lista_aux.append(acumulador)
+        print("-"*30)
+    return lista_aux
+def mostrar_jugador_maximo(jugadores:list):
+    if len(jugadores) == 0:
+        print("Error Lista Vacia")
+    else:
+        lita = jugador_maximo_caracteristicas(jugadores)
+        for i in range(len(jugadores)-1):
+            if lita[i] > lita[i+1]:
+                lita[i], lita[i+1] = lita[i+1], lita[i]
+                jugadores[i], jugadores[i+1] = jugadores[i+1],jugadores[i]
+        print("El jugador con las mejores estadisticas de todos es: {0}".format(jugadores[-1]["nombre"]))
 
 lista_jugadores = leer_archivo("Parcial_op\pp_lab1_alvarez_josue\dt.json")
 menu_principal(lista_jugadores)
